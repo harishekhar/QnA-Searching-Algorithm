@@ -195,8 +195,7 @@ var QnASearch = {
 
     },
     getSearchResult: function (searchKeywordsArr, builtData) {
-        var builtData = builtData,
-            termArr = searchKeywordsArr,
+        var termArr = searchKeywordsArr,
             resultArr = [],
             tempObj = [],
             wordOccurrence;
