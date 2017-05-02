@@ -1,57 +1,11 @@
-jQuery.fn.highlight = function (pat) {
-    function innerHighlight(node, pat) {
-        var skip = 0;
-        if (node.nodeType == 3) {
-            var pos = node.data.toUpperCase().indexOf(pat);
-            pos -= (node.data.substr(0, pos).toUpperCase().length - node.data.substr(0, pos).length);
-            if (pos >= 0) {
-                var spannode = document.createElement('span');
-                spannode.className = 'word__hglght--ylw';
-                var middlebit = node.splitText(pos);
-                var endbit = middlebit.splitText(pat.length);
-                var middleclone = middlebit.cloneNode(true);
-                spannode.appendChild(middleclone);
-                middlebit.parentNode.replaceChild(spannode, middlebit);
-                skip = 1;
-            }
-        } else if (node.nodeType == 1 && node.childNodes && !/(script|style)/i.test(node.tagName)) {
-            for (var i = 0; i < node.childNodes.length; ++i) {
-                i += innerHighlight(node.childNodes[i], pat);
-            }
-        }
-        return skip;
-    }
-    return this.length && pat && pat.length ? this.each(function () {
-        innerHighlight(this, pat.toUpperCase());
-    }) : this;
-};
 
 /* Search scoring functionality [Start] */
 
 var QnASearch = {
     settings: {
-        mspId: function () {
-            if (dataLayer[0].pagetype === 'single') {
-                return dataLayer[0].mspid && dataLayer[0].mspid;
-            } else if ($('.js-prdct-ttl').data('mspid') || dataLayer[0].pagetype === 'qnaSingle') {
-                return $('.js-prdct-ttl').data('mspid') 
-            } else if (dataLayer[0].pagetype === 'qnaList') {
-                
-            }
-        },
-        qnaApi: function () {
-            return '/review/qna/search/?mspid='+QnASearch.settings.mspId();
-        },
-        inputSelector: function () {
-            if (dataLayer[0].pagetype === 'single') {
-                return '.js-qstn-txt';
-            } else if ($('.js-prdct-ttl').data('mspid') || dataLayer[0].pagetype === 'qnaSingle') {
-                return '.js-qstn-txt';
-                
-            } else if (dataLayer[0].pagetype === 'qnaList') {
-                
-            }
-        },
+        mspId: $('.js-prdct-ttl').data('mspid'),
+        qnaApi: QnASearch.settings.mspId,
+        inputSelector: '.js-qstn-txt',
         questionCount: 5, // number of questions in search result
         answerCount: 3, // number of answers in respective question search result if keyword found
         weightage: {
@@ -492,22 +446,15 @@ var QnASearch = {
 // QnA Search code [Needs to be refactor]
 var timeout,
     searchTrigger;
-$(document).on('input', QnASearch.settings.inputSelector(), function ($jsonUrl) {
-    if (!QnASearch.settings.inputSelector()) {
-        return;
-    }
+$(document).on('input', QnASearch.settings.inputSelector, function ($jsonUrl) {
     var $this = $(this);
     if (QnASearch.data.searchWordsArr.length < 1) {
-        QnASearch.data.searchWordsArr = QnASearch.buildFunction.init(QnASearch.settings.qnaApi());
+        QnASearch.data.searchWordsArr = QnASearch.buildFunction.init(QnASearch.settings.qnaApi);
     } else {
         QnASearch.domFunction.loaderHandler();
         clearTimeout(timeout);
         timeout = setTimeout(function () {
             QnASearch.eventFunction.searchInput($this);
         }, 200);
-    }
-    if (window.ga && !searchTrigger) {
-        ga('send', 'event', 'QNA', 'search', QnASearch.settings.inputSelector());
-        searchTrigger = true;
     }
 });
