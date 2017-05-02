@@ -126,7 +126,7 @@ var QnASearch = {
             var stopWords = QnASearch.settings.stopWords;
             return term.replace(/[.\,\/#!$%\^&\*;:{}=\-_`~()?]/g, ' ').replace(
                 /[\s]+/g, ' ').split(' ').reduce(function (a, v) {
-                    if (v.length > 0 || (v === v.toUpperCase() && v.length > 1)) {
+                    if (v.length > 0) {
                         if (stopWords.indexOf(v.toLowerCase()) == -1) {
                             a.push(v);
                         }
